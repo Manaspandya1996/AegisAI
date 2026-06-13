@@ -1,0 +1,6 @@
+{
+  "name": "Aegis AI",
+  "description": "Enterprise-grade Prompt Injection Firewall & SOC Dashboard protecting AI agents from manipulation, jailbreaks, and prompt leaks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

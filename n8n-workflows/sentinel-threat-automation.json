@@ -1,0 +1,161 @@
+{
+  "name": "Sentinel AI Threat Block Alert Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sentinel-alerts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "id": "webhook-trigger",
+      "name": "Webhook - Receive Threat Alert"
+    },
+    {
+      "parameters": {
+        "keepOnlyAndRename": true,
+        "keys": [
+          {
+            "id": "alertId"
+          },
+          {
+            "id": "severity"
+          },
+          {
+            "id": "classifiedCategory",
+            "name": "category"
+          },
+          {
+            "id": "riskScore"
+          },
+          {
+            "id": "payloadText",
+            "name": "attackPayload"
+          },
+          {
+            "id": "remediationAction"
+          },
+          {
+            "id": "timestamp"
+          }
+        ]
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        320,
+        300
+      ],
+      "id": "filter-payload",
+      "name": "Format Alert Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-severity",
+              "leftValue": "={{ $json.severity }}",
+              "rightValue": "Dangerous",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        540,
+        300
+      ],
+      "id": "if-critical",
+      "name": "Is Critical Threat?"
+    },
+    {
+      "parameters": {
+        "html": true,
+        "rawHtml": "<h1>🚨 Sentinel AI - CRITICAL FIREWALL BREACH BLOCKED</h1><p>Our intelligent firewall in front of AI Agents has detected and blocked a high-risk prompt injection attempt.</p><table border='1' cellpadding='8' style='border-collapse:collapse;'><tr><th>Metric</th><th>Details</th></tr><tr><td><b>Alert ID:</b></td><td>{{ $json.alertId }}</td></tr><tr><td><b>Category:</b></td><td>{{ $json.category }}</td></tr><tr><td><b>Risk Score:</b></td><td><span style='color:red;'>{{ $json.riskScore }}/100</span></td></tr><tr><td><b>Blocked Payload:</b></td><td><code>{{ $json.attackPayload }}</code></td></tr><tr><td><b>System Action:</b></td><td>{{ $json.remediationAction }}</td></tr><tr><td><b>Time:</b></td><td>{{ $json.timestamp }}</td></tr></table>",
+        "subject": "⚠️ CRITICAL SEVERITY: Sentinel AI Prompt Injection Blocked"
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [
+        780,
+        180
+      ],
+      "id": "email-alert",
+      "name": "Email SMTP SOC Team"
+    },
+    {
+      "parameters": {
+        "text": "🤖 *SENTINEL AI Firewall Detection Alert*\n• *Severity:* Suspicious\n• *Category:* {{ $json.category }}\n• *Risk Score:* {{ $json.riskScore }}/100\n• *Details:* Scanned payload flagged under low critical rating rules."
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        780,
+        420
+      ],
+      "id": "slack-alert",
+      "name": "Slack Alert Channel"
+    }
+  ],
+  "connections": {
+    "Webhook - Receive Threat Alert": {
+      "main": [
+        [
+          {
+            "node": "Format Alert Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert Fields": {
+      "main": [
+        [
+          {
+            "node": "Is Critical Threat?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Critical Threat?": {
+      "main": [
+        [
+          {
+            "node": "Email SMTP SOC Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Alert Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
