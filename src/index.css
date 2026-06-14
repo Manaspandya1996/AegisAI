@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: #000000;
+  --color-surface: #131313;
+  --color-surface-container: #1f1f1f;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-info-cyan: #00f0ff;
+  --color-danger-magenta: #ff00ff;
+  --color-warning-orange: #ff9900;
+  --color-safe-green: #00ff66;
+  --color-surface-glass: rgba(255, 255, 255, 0.03);
+  --color-border-muted: rgba(255, 255, 255, 0.15);
+  
+  --font-sans: "Inter", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+@layer utilities {
+  .glow-text-cyan {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+  }
+  .glow-text-magenta {
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.6);
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
